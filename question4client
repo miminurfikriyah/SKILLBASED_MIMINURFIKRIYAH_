@@ -1,0 +1,41 @@
+import socket
+import threading
+
+# Function to handle receiving quotes from the server
+def receive_quote(connection_socket):
+    quote = connection_socket.recv(1024).decode()
+    print("Received quote:", quote)
+
+# Main client function
+def main():
+    # Create a TCP socket
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # Connect to the server
+    client_socket.connect(('192.168.139.135', 8888))
+    print("Connected to server.")
+
+    try:
+        while True:
+            # Create a new thread to handle receiving quotes
+            receive_thread = threading.Thread(target=receive_quote, args=(client_socket,))
+            receive_thread.start()
+
+            # Wait for the receive thread to finish
+            receive_thread.join()
+
+            # Ask if the client wants another quote
+            response = input("Do you want another quote? (y/n): ").strip().lower()
+            if response != 'y':
+                break
+
+    except KeyboardInterrupt:
+        print("Client disconnected.")
+    finally:
+        # Close the client socket
+        client_socket.close()
+
+if __name__ == "__main__":
+    main()
+client sample output
+
